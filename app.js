@@ -33,10 +33,13 @@ class View {
             <article class="product">
             <div class="img-container">
                 <img src=${item.image} alt=${item.title} class="product-img">
-                <button class="bag-btn" data-id=${item.id} >add to shopping cart</button>
+                
             </div>
+            <div class="title-container">
             <h3>${item.title}</h3>
-            <h4>${item.price}</h4>
+            <h4>price:${item.price}$</h4>
+            </div>
+            <button class="bag-btn" data-id=${item.id} >add</button>
         </article>
         `
         });
