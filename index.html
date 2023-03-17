@@ -2,28 +2,42 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <link rel="stylesheet" href="./styels/main.css">
-    <title>shopping list</title>
+	<meta charset="UTF-8">
+	<link rel="stylesheet" href="./styels/main.css">
+	<title>shopping list</title>
 </head>
 
 <body>
-    <nav class="header">
-        <div class="cart-btn">
-            <span class="nav-icon">
-                <i class="fa-solid fa-cart-shopping"></i>
-            </span>
-            <div class="cart-items">0</div>
-        </div>
-    </nav>
+	<nav class="header">
+		<div class="cart-btn">
+			<span class="nav-icon">
+				<i class="fa-solid fa-cart-shopping"></i>
+			</span>
+			<div class="cart-items">0</div>
+		</div>
+	</nav>
 
-    <section class="products">
-        
-    </section>
+	<section class="products">
+
+	</section>
+
+	<div class="cart-overlay">
+		<div class="cart">
+			<span class="close-cart">
+				<i class="fas fa-times"></i>
+			</span>
+			<h2>shopping cart</h2>
+			<div class="cart-content"></div>
+			<div class="cart-footer">
+				<h3>total price: <span class="cart-total">55</span></h3>
+				<button class="clear-cart btn">delete products</button>
+			</div>
+		</div>
+	</div>
 
 
-    <script src="app.js"></script>
-    <script src="https://kit.fontawesome.com/0df07ef89b.js" crossorigin="anonymous"></script>
+	<script src="app.js"></script>
+	<script src="https://kit.fontawesome.com/0df07ef89b.js" crossorigin="anonymous"></script>
 </body>
 
 </html>
