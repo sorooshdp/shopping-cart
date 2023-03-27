@@ -1,7 +1,12 @@
-const productsDOM = document.querySelector('.products')
+const cartOverlay = document.querySelector('.cart-overlay');
+const cartContent = document.querySelector('.cart-content');
+const closeCartBtn = document.querySelector('.close-cart');
+const clearCartBtn = document.querySelector('.clear-cart');
+const productsDOM = document.querySelector('.products');
 const cartItems = document.querySelector('.cart-items');
 const cartTotal = document.querySelector('.cart-total');
-const cartContent = document.querySelector('.cart-content')
+const cartBtn = document.querySelector('.cart-btn');
+const cartDOM = document.querySelector('.cart');
 
 let cart = [];
 
@@ -14,11 +19,11 @@ class Product {
             let products = data.items
 
             products = products.map(item => {
-                const {title, price} = item.fields
-                const {id} = item.sys
+                const { title, price } = item.fields
+                const { id } = item.sys
                 const image = item.fields.image.fields.file.url
 
-                return {title, price, id, image}
+                return { title, price, id, image }
             });
 
             return products
@@ -36,11 +41,11 @@ class View {
             <article class="product">
             <div class="img-container">
                 <img src=${item.image} alt=${item.title} class="product-img">
-                <button class="bag-btn" data-id=${item.id} >add</button>
             </div>
             <div class="title-container">
             <h3>${item.title}</h3>
             <h4>price:${item.price}$</h4>
+            <button class="bag-btn" data-id=${item.id} >add</button>
             </div>
             
         </article>
@@ -57,13 +62,15 @@ class View {
             let id = item.dataset.id;
 
             item.addEventListener('click', (event) => {
-                let cartItem = {...Storage.getProducts(id), amount: 1}
+                let cartItem = { ...Storage.getProducts(id), amount: 1 }
                 cart = [...cart, cartItem];
                 Storage.saveCart(cart);
 
                 this.setCarValues(cart)
 
                 this.addCartItem(cartItem)
+
+                // this.showCart();
             })
         })
     }
@@ -78,8 +85,6 @@ class View {
 
         cartTotal.innerHTML = totalPrice;
         cartItems.innerHTML = totalItems;
-
-        console.log(cartTotal, cartItems)
     }
 
     addCartItem(item) {
@@ -91,7 +96,7 @@ class View {
     <div>
       <h4>${item.title}</h4>
       <h5>${item.price}</h5>
-      <span class="remove-item" data-id=${item.id}>حذف</span>
+      <span class="remove-item" data-id=${item.id}>delete</span>
     </div>
     <div>
       <i class="fas fa-chevron-up" data-id=${item.id}></i>
@@ -101,8 +106,108 @@ class View {
     `
 
         cartContent.appendChild(div);
+    }
 
-        console.log(cartContent)
+    showCart() {
+        cartOverlay.classList.add('transparentBcg');
+        cartDOM.classList.add('showCart')
+    }
+
+    initApp() {
+        cart = Storage.getCart()
+
+        this.populate(cart)
+        this.setCarValues(cart)
+
+        cartBtn.addEventListener('click', this.showCart)
+        closeCartBtn.addEventListener('click', this.hideCart)
+    }
+
+    populate(cart) {
+        cart.forEach((item) => {
+            return this.addCartItem(item)
+        })
+    }
+
+    hideCart() {
+        cartOverlay.classList.remove('transparentBcg');
+        cartDOM.classList.remove('showCart')
+    }
+
+    cartProcess() {
+        clearCartBtn.addEventListener('click', () => {
+            this.clearCart()
+        })
+
+        cartContent.addEventListener('click', (event) => {
+            if (event.target.classList.contains('remove-item')) {
+                let removeItem = event.target
+                let id = removeItem.dataset.id
+
+                cartContent.removeChild(removeItem.parentElement.parentElement)
+
+                this.removeProduct(id)
+            }
+
+            if (event.target.classList.contains('fa-chevron-up')) {
+                let addAmount = event.target
+                let id = addAmount.dataset.id
+
+                let product = cart.find((item) => {
+                    return item.id === id
+                })
+
+                product.amount += 1;
+
+                Storage.saveCart(cart)
+                this.setCarValues(cart)
+
+                addAmount.nextElementSibling.innerText = product.amount
+            }
+
+            if (event.target.classList.contains('fa-chevron-down')) {
+                let decreaseAmount = event.target
+                let id = decreaseAmount.dataset.id
+
+                let product = cart.find((item) => {
+                    return item.id === id
+                })
+
+                product.amount = product.amount - 1;
+
+                if (product.amount > 0) {
+                    Storage.saveCart(cart)
+                    this.setCarValues(cart)
+                    decreaseAmount.previousElementSibling.innerText = product.amount
+                } else {
+                    cartContent.removeChild(decreaseAmount.parentElement.parentElement)
+                    this.removeProduct(id)
+                }
+            }
+        })
+    }
+
+    clearCart() {
+        let cartItems = cart.map((item) => {
+            return item.id;
+        })
+
+        cartItems.forEach((item) => {
+            return this.removeProduct(item)
+        })
+
+        while (cartContent.children.length > 0) {
+            cartContent.removeChild(cartContent.children[0]);
+        }
+    }
+
+    removeProduct(id) {
+        cart = cart.filter((item) => {
+            return item.id !== id;
+        })
+
+        this.setCarValues(cart)
+        Storage.saveCart(cart)
     }
 }
 
@@ -120,11 +225,17 @@ class Storage {
 
         return products.find((item) => item.id === id)
     }
+
+    static getCart() {
+        return localStorage.getItem('cart') ? JSON.parse(localStorage.getItem('cart')) : [];
+    }
 }
 
 document.addEventListener("DOMContentLoaded", () => {
     const view = new View()
     const product = new Product()
+
+    view.initApp()
 
     product
         .getProducts()
@@ -132,6 +243,7 @@ document.addEventListener("DOMContentLoaded", () => {
             view.displayProducts(data)
             Storage.saveProducts(data)
         }).then(() => {
-        view.getCartButtons()
-    })
+            view.getCartButtons()
+            view.cartProcess()
+        })
 })
