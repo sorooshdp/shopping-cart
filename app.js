@@ -60,13 +60,17 @@ class View {
     buttons.forEach((item) => {
       let id = item.dataset.id
 
+
       item.addEventListener('click', (event) => {
         let cartItem = { ...Storage.getProduct(id), amount: 1 }
         cart = [...cart, cartItem]
 
+
         Storage.saveCart(cart)
 
+
         this.setCartValues(cart)
+
 
         this.addCartItem(cartItem)
       })
@@ -77,6 +81,7 @@ class View {
     let totalPrice = 0
     let totalItems = 0
 
+
     cart.map((item) => {
       totalPrice = totalPrice + item.price * item.amount
       totalItems = totalItems + item.amount
@@ -85,6 +90,7 @@ class View {
     cartTotal.innerText = totalPrice
     cartItems.innerText = totalItems
   }
+
 
    addCartItem(item) {
     const div = document.createElement('div')
@@ -157,6 +163,7 @@ class View {
 
         product.amount = product.amount + 1
 
+
         Storage.saveCart(cart)
         this.setCartValues(cart)
 
@@ -196,6 +203,7 @@ class View {
 
     while (cartContent.children.length > 0) {
       cartContent.removeChild(cartContent.children[0])
+
     }
   }
 
@@ -219,6 +227,7 @@ class Storage {
 
     return products.find((item) => item.id === id)
   }
+
 
   static saveCart(cart) {
     localStorage.setItem('cart', JSON.stringify(cart))
@@ -248,3 +257,4 @@ document.addEventListener('DOMContentLoaded', () => {
       view.cartProcess()
     })
 })
+
